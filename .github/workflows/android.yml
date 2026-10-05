@@ -275,7 +275,7 @@ jobs:
           cp "${APK_DIR}"/*.apk "${TEMP_DIR}/build/${{ env.PACKAGE }}.apk"
 
       - name: Upload Custom Android APK Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Custom-QGroundControl-Android-${{ matrix.host }}-${{ matrix.artifact_abi_suffix }}
           path: ${{ runner.temp }}/build/${{ env.PACKAGE }}.apk

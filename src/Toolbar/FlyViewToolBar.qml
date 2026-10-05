@@ -147,8 +147,8 @@ Item {
     // part of the Flickable
     Rectangle {
         id:                         guidedActionMessageDisplay
-        anchors.top:                control.bottom
-        anchors.topMargin:          _margins
+        anchors.bottom:             control.top
+        anchors.bottomMargin:       _margins
         x:                          control.mapFromItem(guidedActionConfirm.parent, guidedActionConfirm.x, 0).x + (guidedActionConfirm.width - guidedActionMessageDisplay.width) / 2
         width:                      messageLabel.contentWidth + (_margins * 2)
         height:                     messageLabel.contentHeight + (_margins * 2)

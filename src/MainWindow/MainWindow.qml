@@ -437,7 +437,7 @@ ApplicationWindow {
             id:             toolDrawerToolbar
             anchors.left:   parent.left
             anchors.right:  parent.right
-            anchors.top:    parent.top
+            anchors.bottom: parent.bottom
             height:         ScreenTools.toolbarHeight
             color:          qgcPal.toolbarBackground
 
@@ -470,8 +470,8 @@ ApplicationWindow {
             id:             toolDrawerLoader
             anchors.left:   parent.left
             anchors.right:  parent.right
-            anchors.top:    toolDrawerToolbar.bottom
-            anchors.bottom: parent.bottom
+            anchors.top:    parent.top
+            anchors.bottom: toolDrawerToolbar.top
         }
     }
 
@@ -506,7 +506,7 @@ ApplicationWindow {
     Popup {
         id:                 criticalVehicleMessagePopup
         objectName:         "criticalVehicleMessage_popup"
-        y:                  ScreenTools.toolbarHeight + ScreenTools.defaultFontPixelHeight - topInset
+        y:                  ScreenTools.defaultFontPixelHeight + topInset
         x:                  Math.round((mainWindow.width - width) * 0.5)
         width:              mainWindow.width  * 0.55
         height:             criticalVehicleMessageText.contentHeight + _chromeHeight
@@ -634,7 +634,7 @@ ApplicationWindow {
     Popup {
         id:             indicatorDrawer
         x:              calcXPosition()
-        y:              ScreenTools.toolbarHeight + _margins
+        y:              calcYPosition()
         leftInset:      0
         rightInset:     0
         topInset:       0
@@ -651,6 +651,11 @@ ApplicationWindow {
         property bool _expanded:    false
         property real _margins:     ScreenTools.defaultFontPixelHeight / 4
         property bool _fillWindow:  indicatorDrawerLoader.item ? indicatorDrawerLoader.item.fillWindow === true : false
+
+        function calcYPosition() {
+            var calculatedY = mainWindow.contentItem.height - ScreenTools.toolbarHeight - height - _margins
+            return Math.max(_margins, calculatedY)
+        }
 
         function calcXPosition() {
             if (_fillWindow) {

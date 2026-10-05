@@ -242,6 +242,9 @@ Item {
 
     PlanViewToolBar {
         id: planToolBar
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
         planMasterController: _planMasterController
         showRallyPointsHelp: _editingLayer === _layerRally
     }
@@ -250,8 +253,8 @@ Item {
         id: mainPlanViewArea
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: planToolBar.bottom
-        anchors.bottom: parent.bottom
+        anchors.top: parent.top
+        anchors.bottom: planToolBar.top
 
         FlightMap {
             id: editorMap

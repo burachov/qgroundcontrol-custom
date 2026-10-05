@@ -134,7 +134,7 @@ Item {
             anchors.left:           parent.left
             anchors.right:          guidedValueSlider.visible ? guidedValueSlider.left : parent.right
             anchors.margins:        _widgetMargin
-            anchors.topMargin:      toolbar.height + _widgetMargin
+            anchors.bottomMargin:   toolbar.height + _widgetMargin
             z:                      _fullItemZorder + 2
             pipViewRect:            _pipView.visible ? Qt.rect(_pipView.x + _pipView.occupiedRect.x - x, _pipView.y + _pipView.occupiedRect.y - y, _pipView.occupiedRect.width, _pipView.occupiedRect.height) : Qt.rect(0, height, 0, 0)
             mapControl:             _mapControl
@@ -174,7 +174,7 @@ Item {
             anchors.right:      parent.right
             anchors.top:        parent.top
             anchors.bottom:     parent.bottom
-            anchors.topMargin:  toolbar.height
+            anchors.bottomMargin: toolbar.height
             z:                  QGroundControl.zOrderTopMost
             visible:            false
         }
@@ -202,6 +202,9 @@ Item {
 
     FlyViewToolBar {
         id:                 toolbar
+        anchors.left:       parent.left
+        anchors.right:      parent.right
+        anchors.bottom:     parent.bottom
         guidedValueSlider:  _guidedValueSlider
         visible:            !QGroundControl.videoManager.fullScreen
     }

@@ -180,12 +180,12 @@ QString QGCCorePlugin::showAdvancedUIMessage() const
 
 bool QGCCorePlugin::showInitialSetupVehiclePreferences() const
 {
-    return !FirmwarePluginManager::instance()->singleVehicleSupport();
+    return false;
 }
 
 bool QGCCorePlugin::showInitialSetupMeasurementUnits() const
 {
-    return true;
+    return false;
 }
 
 void QGCCorePlugin::factValueGridCreateDefaultSettings(FactValueGrid* factValueGrid)
@@ -348,10 +348,6 @@ const QVariantList &QGCCorePlugin::toolBarIndicators()
 
 QList<int> QGCCorePlugin::firstRunPromptStdIds()
 {
-    if (showInitialSetupVehiclePreferences() || showInitialSetupMeasurementUnits()) {
-        return { kInitialSetupPromptId };
-    }
-
     return {};
 }
 

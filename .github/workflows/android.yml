@@ -94,7 +94,7 @@ jobs:
 
       - name: Save Configure Logs on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cmake-configure-logs
           path: |
@@ -148,7 +148,7 @@ jobs:
           $BUILD_TOOLS_DIR/apksigner verify --verbose "$TARGET_APK"
 
       - name: Save APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: QGroundControl-DJI-RC-Plus-2-apk
           path: ${{ runner.temp }}/shadow_build_dir/output_apk/QGroundControl-DJI-RC-Plus-2.apk

@@ -127,8 +127,17 @@ public:
 
     Q_INVOKABLE void    saveGlobalSetting       (const QString& key, const QString& value);
     Q_INVOKABLE QString loadGlobalSetting       (const QString& key, const QString& defaultValue);
+    Q_INVOKABLE void    saveStringGlobalSetting (const QString& key, const QString& value) { saveGlobalSetting(key, value); }
+    Q_INVOKABLE QString loadStringGlobalSetting (const QString& key, const QString& defaultValue) { return loadGlobalSetting(key, defaultValue); }
     Q_INVOKABLE void    saveBoolGlobalSetting   (const QString& key, bool value);
     Q_INVOKABLE bool    loadBoolGlobalSetting   (const QString& key, bool defaultValue);
+    Q_INVOKABLE void    saveIntGlobalSetting    (const QString& key, int value);
+    Q_INVOKABLE int     loadIntGlobalSetting    (const QString& key, int defaultValue);
+    Q_INVOKABLE void    saveDoubleGlobalSetting (const QString& key, double value);
+    Q_INVOKABLE double  loadDoubleGlobalSetting (const QString& key, double defaultValue);
+
+signals:
+    void globalSettingChanged(const QString& key);
 
     Q_INVOKABLE static void deleteAllSettingsNextBoot();
     Q_INVOKABLE static void clearDeleteAllSettingsNextBoot();

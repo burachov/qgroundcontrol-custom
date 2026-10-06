@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+	<string name="app_name">Wooooow GS</string>
 	<string name="devices">USB Devices</string>
     <string name="CdcAcm">CDC ACM USB Device</string>
     <string name="ChromeCcd">Chrome CCD USB Device</string>

@@ -37,6 +37,29 @@ Item {
 
     visible: showOSD
 
+    function reloadSettings() {
+        showOSD        = QGroundControl.loadBoolGlobalSetting("OSD_Enabled", true)
+        showCrosshair  = QGroundControl.loadBoolGlobalSetting("OSD_ShowCrosshair", true)
+        showHorizon    = QGroundControl.loadBoolGlobalSetting("OSD_ShowHorizon", true)
+        showBattery    = QGroundControl.loadBoolGlobalSetting("OSD_ShowBattery", true)
+        showAltitude   = QGroundControl.loadBoolGlobalSetting("OSD_ShowAltitude", true)
+        showSpeed      = QGroundControl.loadBoolGlobalSetting("OSD_ShowSpeed", true)
+        showDistance   = QGroundControl.loadBoolGlobalSetting("OSD_ShowDistance", true)
+        showGps        = QGroundControl.loadBoolGlobalSetting("OSD_ShowGps", true)
+        showFlightMode = QGroundControl.loadBoolGlobalSetting("OSD_ShowFlightMode", true)
+        crosshairStyle = QGroundControl.loadIntGlobalSetting("OSD_CrosshairStyle", 1)
+        osdColor       = QGroundControl.loadStringGlobalSetting("OSD_Color", "#00ff66")
+    }
+
+    Connections {
+        target: QGroundControl
+        function onGlobalSettingChanged(key) {
+            if (key.indexOf("OSD_") === 0) {
+                osdRoot.reloadSettings()
+            }
+        }
+    }
+
     // Telemetry Facts
     property real   pitch:              _activeVehicle ? _activeVehicle.pitch.rawValue : 0
     property real   roll:               _activeVehicle ? _activeVehicle.roll.rawValue : 0
@@ -120,6 +143,10 @@ Item {
                 ctx.lineTo(30, 22)
                 ctx.lineTo(45, 38)
                 ctx.stroke()
+            }
+            Connections {
+                target: osdRoot
+                function onOsdColorChanged() { chevronCanvas.requestPaint() }
             }
         }
 

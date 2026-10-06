@@ -251,6 +251,12 @@ void QGCApplication::setLanguage()
         }
     }
 
+    if (_locale.language() == QLocale::Ukrainian) {
+        setApplicationDisplayName(QStringLiteral("Дохуя GS"));
+    } else {
+        setApplicationDisplayName(QStringLiteral("Wooooow GS"));
+    }
+
     if (_qmlAppEngine) {
         _qmlAppEngine->retranslate();
     }

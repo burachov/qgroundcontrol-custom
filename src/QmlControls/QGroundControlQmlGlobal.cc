@@ -169,6 +169,7 @@ void QGroundControlQmlGlobal::saveGlobalSetting (const QString& key, const QStri
     QSettings settings;
     settings.beginGroup(kQmlGlobalKeyName);
     settings.setValue(key, value);
+    emit globalSettingChanged(key);
 }
 
 QString QGroundControlQmlGlobal::loadGlobalSetting (const QString& key, const QString& defaultValue)
@@ -183,6 +184,7 @@ void QGroundControlQmlGlobal::saveBoolGlobalSetting (const QString& key, bool va
     QSettings settings;
     settings.beginGroup(kQmlGlobalKeyName);
     settings.setValue(key, value);
+    emit globalSettingChanged(key);
 }
 
 bool QGroundControlQmlGlobal::loadBoolGlobalSetting (const QString& key, bool defaultValue)
@@ -190,6 +192,36 @@ bool QGroundControlQmlGlobal::loadBoolGlobalSetting (const QString& key, bool de
     QSettings settings;
     settings.beginGroup(kQmlGlobalKeyName);
     return settings.value(key, defaultValue).toBool();
+}
+
+void QGroundControlQmlGlobal::saveIntGlobalSetting (const QString& key, int value)
+{
+    QSettings settings;
+    settings.beginGroup(kQmlGlobalKeyName);
+    settings.setValue(key, value);
+    emit globalSettingChanged(key);
+}
+
+int QGroundControlQmlGlobal::loadIntGlobalSetting (const QString& key, int defaultValue)
+{
+    QSettings settings;
+    settings.beginGroup(kQmlGlobalKeyName);
+    return settings.value(key, defaultValue).toInt();
+}
+
+void QGroundControlQmlGlobal::saveDoubleGlobalSetting (const QString& key, double value)
+{
+    QSettings settings;
+    settings.beginGroup(kQmlGlobalKeyName);
+    settings.setValue(key, value);
+    emit globalSettingChanged(key);
+}
+
+double QGroundControlQmlGlobal::loadDoubleGlobalSetting (const QString& key, double defaultValue)
+{
+    QSettings settings;
+    settings.beginGroup(kQmlGlobalKeyName);
+    return settings.value(key, defaultValue).toDouble();
 }
 
 void QGroundControlQmlGlobal::startPX4MockLink(bool sendStatusText)
@@ -398,7 +430,8 @@ QString QGroundControlQmlGlobal::telemetryFileExtension() const
 
 QString QGroundControlQmlGlobal::appName()
 {
-    return QCoreApplication::applicationName();
+    QString disp = QGuiApplication::applicationDisplayName();
+    return disp.isEmpty() ? QCoreApplication::applicationName() : disp;
 }
 
 void QGroundControlQmlGlobal::deleteAllSettingsNextBoot()

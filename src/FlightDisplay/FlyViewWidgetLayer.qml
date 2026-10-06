@@ -88,7 +88,6 @@ Item {
         anchors.margins:    _layoutMargin
         anchors.top:        parent.top
         anchors.topMargin:  ScreenTools.toolbarHeight + _layoutMargin
-        anchors.bottom:     bottomRightRowLayout.top
         anchors.right:      parent.right
         spacing:            _layoutSpacing
         visible:           !topRightPanel.visible
@@ -98,16 +97,126 @@ Item {
         property real rightEdgeCenterInset: rightEdgeTopInset
     }
 
-    FlyViewBottomRightRowLayout {
-        id:                 bottomRightRowLayout
-        anchors.margins:    _layoutMargin
-        anchors.bottom:     parent.bottom
-        anchors.right:      parent.right
-        spacing:            _layoutSpacing
+    Item {
+        id:                 movableInstruments
+        z:                  QGroundControl.zOrderWidgets
+        width:              bottomRightRowLayout.width
+        height:             bottomRightRowLayout.height + (isPinned ? 0 : dragHandleBar.height)
+
+        property bool isPinned: QGroundControl.loadBoolGlobalSetting("Instruments_Pinned", false)
+        property real savedX:   QGroundControl.loadDoubleGlobalSetting("Instruments_PosX", -1)
+        property real savedY:   QGroundControl.loadDoubleGlobalSetting("Instruments_PosY", -1)
+
+        x: (savedX >= 0 && savedX <= (parent.width - width)) ? savedX : (parent.width - width - _layoutMargin)
+        y: (savedY >= 0 && savedY <= (parent.height - height)) ? savedY : (parent.height - height - _layoutMargin)
 
         property real bottomEdgeRightInset:     height + _layoutMargin
         property real bottomEdgeCenterInset:    bottomEdgeRightInset
         property real rightEdgeBottomInset:     width + _layoutMargin
+
+        // Drag handle bar with Pin / Unpin and Edit buttons
+        Rectangle {
+            id:                 dragHandleBar
+            anchors.top:        parent.top
+            anchors.left:       parent.left
+            anchors.right:      parent.right
+            height:             isPinned ? 0 : ScreenTools.defaultFontPixelHeight * 2
+            visible:            !isPinned
+            color:              "#DD1A1A1A"
+            radius:             4
+            border.color:       qgcPal.colorGreen
+            border.width:       1
+            z:                  2
+
+            RowLayout {
+                anchors.fill:       parent
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                spacing:            6
+
+                QGCLabel {
+                    text:               qsTr("✥ DRAG")
+                    font.bold:          true
+                    font.pointSize:     ScreenTools.smallFontPointSize
+                    color:              qgcPal.colorGreen
+                    Layout.fillWidth:   true
+                }
+
+                QGCButton {
+                    text:               qsTr("⚙ Edit Values")
+                    font.pointSize:     ScreenTools.smallFontPointSize * 0.9
+                    Layout.preferredHeight: dragHandleBar.height - 8
+                    onClicked: {
+                        if (bottomRightRowLayout.telemetryValuesBar) {
+                            var grid = bottomRightRowLayout.telemetryValuesBar.factValueGrid
+                            grid.settingsUnlocked = !grid.settingsUnlocked
+                        }
+                    }
+                }
+
+                QGCButton {
+                    text:               qsTr("📌 Pin")
+                    font.pointSize:     ScreenTools.smallFontPointSize * 0.9
+                    Layout.preferredHeight: dragHandleBar.height - 8
+                    onClicked: {
+                        movableInstruments.isPinned = true
+                        QGroundControl.saveBoolGlobalSetting("Instruments_Pinned", true)
+                    }
+                }
+            }
+
+            MouseArea {
+                id:                 dragArea
+                anchors.fill:       parent
+                drag.target:        movableInstruments
+                drag.axis:          Drag.XAndYAxis
+                drag.minimumX:      10
+                drag.maximumX:      movableInstruments.parent ? (movableInstruments.parent.width - movableInstruments.width - 10) : 500
+                drag.minimumY:      60
+                drag.maximumY:      movableInstruments.parent ? (movableInstruments.parent.height - movableInstruments.height - 10) : 500
+                onReleased: {
+                    QGroundControl.saveDoubleGlobalSetting("Instruments_PosX", movableInstruments.x)
+                    QGroundControl.saveDoubleGlobalSetting("Instruments_PosY", movableInstruments.y)
+                }
+            }
+        }
+
+        // Small toggle button when pinned so user can unpin at any time
+        Rectangle {
+            anchors.top:        parent.top
+            anchors.right:      parent.right
+            anchors.topMargin:  -ScreenTools.defaultFontPixelHeight * 0.5
+            anchors.rightMargin: -ScreenTools.defaultFontPixelWidth * 0.5
+            width:              ScreenTools.defaultFontPixelHeight * 1.6
+            height:             width
+            radius:             width / 2
+            color:              "#CC222222"
+            border.color:       qgcPal.button
+            border.width:       1
+            visible:            isPinned
+            z:                  10
+
+            QGCLabel {
+                anchors.centerIn:   parent
+                text:               "📌"
+                font.pointSize:     ScreenTools.smallFontPointSize * 0.8
+            }
+
+            MouseArea {
+                anchors.fill:   parent
+                onClicked: {
+                    movableInstruments.isPinned = false
+                    QGroundControl.saveBoolGlobalSetting("Instruments_Pinned", false)
+                }
+            }
+        }
+
+        FlyViewBottomRightRowLayout {
+            id:                 bottomRightRowLayout
+            anchors.top:        isPinned ? parent.top : dragHandleBar.bottom
+            anchors.left:       parent.left
+            spacing:            _layoutSpacing
+        }
     }
 
     // Missions disabled: mission complete dialog suppressed

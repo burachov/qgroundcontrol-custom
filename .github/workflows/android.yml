@@ -76,6 +76,16 @@ jobs:
               -DQGC_ENABLE_HERELINK=ON
               -DQGC_STABLE_BUILD=${{ github.ref_type == 'tag' || contains(github.ref, 'Stable') && 'ON' || 'OFF' }}
 
+      - name: Save Configure Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmake-configure-logs
+          path: |
+            ${{ runner.temp }}/shadow_build_dir/CMakeFiles/CMakeOutput.log
+            ${{ runner.temp }}/shadow_build_dir/CMakeFiles/CMakeError.log
+            ${{ runner.temp }}/shadow_build_dir/CMakeFiles/CMakeConfigureLog.yaml
+
       - name: Build
         working-directory: ${{ runner.temp }}/shadow_build_dir
         run: cmake --build . --target all --config ${{ matrix.BuildType }}

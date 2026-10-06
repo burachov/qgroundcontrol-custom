@@ -32,10 +32,10 @@ jobs:
       ARTIFACT: QGroundControl.apk
       PACKAGE: QGroundControl
       QT_VERSION: 6.6.3
-      QT_ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/deploy/android/android_release.keystore
-      QT_ANDROID_KEYSTORE_ALIAS: QGCAndroidKeyStore
-      QT_ANDROID_KEYSTORE_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      QT_ANDROID_KEYSTORE_KEY_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      QT_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/custom_release.keystore
+      QT_ANDROID_KEYSTORE_ALIAS: qgc_release
+      QT_ANDROID_KEYSTORE_STORE_PASS: qgcandroid123
+      QT_ANDROID_KEYSTORE_KEY_PASS: qgcandroid123
       QT_ANDROID_ABIS: arm64-v8a
 
     steps:
@@ -63,6 +63,18 @@ jobs:
           abis: ${{ env.QT_ANDROID_ABIS }}
           cpm-modules: ${{ runner.temp }}/shadow_build_dir/cpm_modules
 
+      - name: Create Release Keystore
+        run: |
+          keytool -genkey -v \
+            -keystore ${{ env.QT_ANDROID_KEYSTORE_PATH }} \
+            -alias ${{ env.QT_ANDROID_KEYSTORE_ALIAS }} \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass ${{ env.QT_ANDROID_KEYSTORE_STORE_PASS }} \
+            -keypass ${{ env.QT_ANDROID_KEYSTORE_KEY_PASS }} \
+            -dname "CN=QGroundControl, OU=DJI-RC-Plus-2, O=CustomQGC, L=Custom, S=Custom, C=US"
+
       - name: Configure
         working-directory: ${{ runner.temp }}/shadow_build_dir
         run: ${{ env.QT_ROOT_DIR }}/bin/qt-cmake -S ${{ github.workspace }} -B . -G Ninja
@@ -71,7 +83,11 @@ jobs:
               -DQT_ANDROID_ABIS="${{ env.QT_ANDROID_ABIS }}"
               -DQT_ANDROID_BUILD_ALL_ABIS=OFF
               -DQT_HOST_PATH="${{ env.QT_ROOT_DIR }}/../gcc_64"
-              -DQT_ANDROID_SIGN_APK=${{ env.QT_ANDROID_KEYSTORE_STORE_PASS != '' && 'ON' || 'OFF' }}
+              -DQT_ANDROID_SIGN_APK=ON
+              -DQT_ANDROID_KEYSTORE_PATH="${{ env.QT_ANDROID_KEYSTORE_PATH }}"
+              -DQT_ANDROID_KEYSTORE_ALIAS="${{ env.QT_ANDROID_KEYSTORE_ALIAS }}"
+              -DQT_ANDROID_KEYSTORE_STORE_PASS="${{ env.QT_ANDROID_KEYSTORE_STORE_PASS }}"
+              -DQT_ANDROID_KEYSTORE_KEY_PASS="${{ env.QT_ANDROID_KEYSTORE_KEY_PASS }}"
               -DQT_DEBUG_FIND_PACKAGE=ON
               -DQGC_ENABLE_HERELINK=ON
               -DQGC_STABLE_BUILD=${{ github.ref_type == 'tag' || contains(github.ref, 'Stable') && 'ON' || 'OFF' }}
@@ -90,8 +106,49 @@ jobs:
         working-directory: ${{ runner.temp }}/shadow_build_dir
         run: cmake --build . --target all --config ${{ matrix.BuildType }}
 
+      - name: Sign and Align APK
+        working-directory: ${{ runner.temp }}/shadow_build_dir
+        run: |
+          mkdir -p output_apk
+          BUILD_TOOLS_DIR=$(ls -d /usr/local/lib/android/sdk/build-tools/* | sort -V | tail -n 1)
+          echo "Using Android Build Tools from: $BUILD_TOOLS_DIR"
+          
+          APKS=$(find . -name "*.apk" -type f)
+          echo "Found APK files:"
+          echo "$APKS"
+          
+          TARGET_APK="output_apk/QGroundControl-DJI-RC-Plus-2.apk"
+          
+          for apk in $APKS; do
+            echo "Checking $apk..."
+            if $BUILD_TOOLS_DIR/apksigner verify "$apk" >/dev/null 2>&1; then
+              echo "$apk is already properly signed."
+              cp "$apk" "$TARGET_APK"
+              break
+            fi
+          done
+          
+          if [ ! -f "$TARGET_APK" ]; then
+            RAW_APK=$(find . -name "*unsigned.apk" -type f | head -n 1)
+            if [ -z "$RAW_APK" ]; then
+              RAW_APK=$(find . -name "*.apk" -type f | head -n 1)
+            fi
+            echo "Signing $RAW_APK..."
+            $BUILD_TOOLS_DIR/zipalign -v -p 4 "$RAW_APK" aligned.apk || cp "$RAW_APK" aligned.apk
+            $BUILD_TOOLS_DIR/apksigner sign --ks "${{ env.QT_ANDROID_KEYSTORE_PATH }}" \
+              --ks-key-alias "${{ env.QT_ANDROID_KEYSTORE_ALIAS }}" \
+              --ks-pass "pass:${{ env.QT_ANDROID_KEYSTORE_STORE_PASS }}" \
+              --key-pass "pass:${{ env.QT_ANDROID_KEYSTORE_KEY_PASS }}" \
+              --out "$TARGET_APK" \
+              aligned.apk
+            rm -f aligned.apk
+          fi
+          
+          echo "=== APK SIGNATURE VERIFICATION ==="
+          $BUILD_TOOLS_DIR/apksigner verify --verbose "$TARGET_APK"
+
       - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: QGroundControl-DJI-RC-Plus-2-apk
-          path: ${{ runner.temp }}/shadow_build_dir/**/*.apk
+          path: ${{ runner.temp }}/shadow_build_dir/output_apk/QGroundControl-DJI-RC-Plus-2.apk

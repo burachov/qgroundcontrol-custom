@@ -139,6 +139,7 @@ public:
 signals:
     void globalSettingChanged(const QString& key);
 
+public:
     Q_INVOKABLE static void deleteAllSettingsNextBoot();
     Q_INVOKABLE static void clearDeleteAllSettingsNextBoot();
 

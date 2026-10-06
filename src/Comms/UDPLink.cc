@@ -293,6 +293,8 @@ void UDPWorker::setupSocket()
     _localAddresses = QSet(localAddresses.constBegin(), localAddresses.constEnd());
 
     _socket->setProxy(QNetworkProxy::NoProxy);
+    _socket->setSocketOption(QAbstractSocket::ReceiveBufferSizeSocketOption, 2 * 1024 * 1024);
+    _socket->setSocketOption(QAbstractSocket::SendBufferSizeSocketOption, 1024 * 1024);
 
     (void) connect(_socket, &QUdpSocket::connected, this, &UDPWorker::_onSocketConnected);
     (void) connect(_socket, &QUdpSocket::disconnected, this, &UDPWorker::_onSocketDisconnected);

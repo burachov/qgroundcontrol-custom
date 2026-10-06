@@ -74,9 +74,9 @@ Item {
         id:                     topRightPanel
         anchors.top:            parent.top
         anchors.right:          parent.right
-        anchors.topMargin:      _layoutMargin
+        anchors.topMargin:      ScreenTools.toolbarHeight + _layoutMargin
         anchors.rightMargin:    _layoutMargin
-        maximumHeight:          parent.height - (bottomRightRowLayout.height + _margins * 5)
+        maximumHeight:          parent.height - (bottomRightRowLayout.height + _margins * 5) - ScreenTools.toolbarHeight
 
         property real topEdgeRightInset:    height + _layoutMargin
         property real rightEdgeTopInset:    width + _layoutMargin
@@ -87,6 +87,7 @@ Item {
         id:                 topRightColumnLayout
         anchors.margins:    _layoutMargin
         anchors.top:        parent.top
+        anchors.topMargin:  ScreenTools.toolbarHeight + _layoutMargin
         anchors.bottom:     bottomRightRowLayout.top
         anchors.right:      parent.right
         spacing:            _layoutSpacing
@@ -109,15 +110,12 @@ Item {
         property real rightEdgeBottomInset:     width + _layoutMargin
     }
 
-    FlyViewMissionCompleteDialog {
-        missionController:      _missionController
-        geoFenceController:     _geoFenceController
-        rallyPointController:   _rallyPointController
-    }
+    // Missions disabled: mission complete dialog suppressed
 
     GuidedActionConfirm {
         anchors.margins:            _toolsMargin
-        anchors.top:                parent.top
+        anchors.bottom:             parent.bottom
+        anchors.bottomMargin:       _toolsMargin * 2
         anchors.horizontalCenter:   parent.horizontalCenter
         z:                          QGroundControl.zOrderTopMost
         guidedController:           _guidedController
@@ -174,11 +172,10 @@ Item {
     FlyViewToolStrip {
         id:                     toolStrip
         anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeCenterInset
-        anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
         anchors.left:           parent.left
-        anchors.top:            parent.top
+        anchors.verticalCenter: parent.verticalCenter
         z:                      QGroundControl.zOrderWidgets
-        maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
+        maxHeight:              parent.height - parentToolInsets.bottomEdgeLeftInset - (_toolsMargin * 2)
         visible:                !QGroundControl.videoManager.fullScreen
 
         onDisplayPreFlightChecklist: {

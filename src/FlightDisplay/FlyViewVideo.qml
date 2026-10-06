@@ -68,6 +68,12 @@ Item {
         source:         QGroundControl.videoManager.uvcEnabled ? "qrc:/qml/QGroundControl/FlightDisplay/FlightDisplayViewUVC.qml" : "qrc:/qml/QGroundControl/FlightDisplay//FlightDisplayViewDummy.qml"
     }
 
+    CustomVideoOSD {
+        id:             tacticalOsd
+        anchors.fill:   parent
+        visible:        _root.pipState.state === _root.pipState.fullState
+    }
+
     QGCLabel {
         text: qsTr("Double-click to exit full screen")
         font.pointSize: ScreenTools.largeFontPointSize

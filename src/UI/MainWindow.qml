@@ -215,15 +215,7 @@ ApplicationWindow {
     property string closeDialogTitle: qsTr("Close %1").arg(QGroundControl.appName)
 
     function checkForUnsavedMission() {
-        if (planView._planMasterController.dirty) {
-            showMessageDialog(closeDialogTitle,
-                              qsTr("You have a mission edit in progress which has not been saved/sent. If you close you will lose changes. Are you sure you want to close?"),
-                              Dialog.Yes | Dialog.No,
-                              function() { _closeChecksToSkip |= _skipUnsavedMissionCheckMask; performCloseChecks() })
-            return false
-        } else {
-            return true
-        }
+        return true
     }
 
     function checkForPendingParameterWrites() {
@@ -336,18 +328,6 @@ ApplicationWindow {
                         Layout.margins: toolSelectDialog._margins
                         spacing:        ScreenTools.defaultFontPixelWidth
 
-                        SubMenuButton {
-                            height:             toolSelectDialog._toolButtonHeight
-                            Layout.fillWidth:   true
-                            text:               qsTr("Plan Flight")
-                            imageResource:      "/qmlimages/Plan.svg"
-                            onClicked: {
-                                if (mainWindow.allowViewSwitch()) {
-                                    mainWindow.closeIndicatorDrawer()
-                                    mainWindow.showPlanView()
-                                }
-                            }
-                        }
 
                         SubMenuButton {
                             id:                 analyzeButton
@@ -483,7 +463,7 @@ ApplicationWindow {
             id:             toolDrawerToolbar
             anchors.left:   parent.left
             anchors.right:  parent.right
-            anchors.top:    parent.top
+            anchors.bottom: parent.bottom
             height:         ScreenTools.toolbarHeight
             color:          qgcPal.toolbarBackground
 
@@ -521,8 +501,8 @@ ApplicationWindow {
             id:             toolDrawerLoader
             anchors.left:   parent.left
             anchors.right:  parent.right
-            anchors.top:    toolDrawerToolbar.bottom
-            anchors.bottom: parent.bottom
+            anchors.top:    parent.top
+            anchors.bottom: toolDrawerToolbar.top
 
             Connections {
                 target:                 toolDrawerLoader.item
@@ -550,7 +530,7 @@ ApplicationWindow {
 
     Popup {
         id:                 criticalVehicleMessagePopup
-        y:                  ScreenTools.toolbarHeight + ScreenTools.defaultFontPixelHeight
+        y:                  ScreenTools.defaultFontPixelHeight * 4
         x:                  Math.round((mainWindow.width - width) * 0.5)
         width:              mainWindow.width  * 0.55
         height:             criticalVehicleMessageText.contentHeight + ScreenTools.defaultFontPixelHeight * 2
@@ -653,7 +633,7 @@ ApplicationWindow {
     Popup {
         id:             indicatorDrawer
         x:              calcXPosition()
-        y:              ScreenTools.toolbarHeight + _margins
+        y:              calcYPosition()
         leftInset:      0
         rightInset:     0
         topInset:       0
@@ -669,6 +649,11 @@ ApplicationWindow {
 
         property bool _expanded:    false
         property real _margins:     ScreenTools.defaultFontPixelHeight / 4
+
+        function calcYPosition() {
+            var preferredY = mainWindow.height - ScreenTools.toolbarHeight - height - _margins
+            return Math.max(_margins, preferredY)
+        }
 
         function calcXPosition() {
             if (indicatorItem) {

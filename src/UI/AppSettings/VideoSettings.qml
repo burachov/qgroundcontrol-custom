@@ -78,6 +78,14 @@ SettingsPage {
             fact:                       _videoSettings.udpUrl
             visible:                    _requiresUDPUrl && _videoSettings.udpUrl.visible
         }
+
+        LabelledFactTextField {
+            Layout.fillWidth:           true
+            textFieldPreferredWidth:    _urlFieldWidth
+            label:                      qsTr("Custom Pipeline")
+            fact:                       _videoSettings.customGstreamerPipeline
+            visible:                    _isGST && _videoSettings.customGstreamerPipeline.visible
+        }
     }
 
     SettingsGroupLayout {

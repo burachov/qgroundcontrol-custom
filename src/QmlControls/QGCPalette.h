@@ -18,6 +18,8 @@
     { \
         PaletteColorInfo_t colorInfo = { \
             { QColor(lightDisabled), QColor(lightEnabled) }, \
+            { QColor(darkDisabled), QColor(darkEnabled) }, \
+            { QColor(darkDisabled), QColor(darkEnabled) }, \
             { QColor(darkDisabled), QColor(darkEnabled) } \
         }; \
         QGCCorePlugin::instance()->paletteOverride(#name, colorInfo); \
@@ -25,12 +27,38 @@
         _colorInfoMap[Light][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Light][ColorGroupDisabled]; \
         _colorInfoMap[Dark][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupEnabled]; \
         _colorInfoMap[Dark][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupDisabled]; \
+        _colorInfoMap[RedBlack][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupEnabled]; \
+        _colorInfoMap[RedBlack][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupDisabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupEnabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupDisabled]; \
+        _colors << #name; \
+    }
+
+#define DECLARE_QGC_COLOR_THEMED(name, lightDisabled, lightEnabled, darkDisabled, darkEnabled, redDisabled, redEnabled, greenDisabled, greenEnabled) \
+    { \
+        PaletteColorInfo_t colorInfo = { \
+            { QColor(lightDisabled), QColor(lightEnabled) }, \
+            { QColor(darkDisabled), QColor(darkEnabled) }, \
+            { QColor(redDisabled), QColor(redEnabled) }, \
+            { QColor(greenDisabled), QColor(greenEnabled) } \
+        }; \
+        QGCCorePlugin::instance()->paletteOverride(#name, colorInfo); \
+        _colorInfoMap[Light][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[Light][ColorGroupEnabled]; \
+        _colorInfoMap[Light][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Light][ColorGroupDisabled]; \
+        _colorInfoMap[Dark][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupEnabled]; \
+        _colorInfoMap[Dark][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupDisabled]; \
+        _colorInfoMap[RedBlack][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupEnabled]; \
+        _colorInfoMap[RedBlack][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupDisabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupEnabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupDisabled]; \
         _colors << #name; \
     }
 
 #define DECLARE_QGC_NONTHEMED_COLOR(name, disabledColor, enabledColor) \
     { \
         PaletteColorInfo_t colorInfo = { \
+            { QColor(disabledColor), QColor(enabledColor) }, \
+            { QColor(disabledColor), QColor(enabledColor) }, \
             { QColor(disabledColor), QColor(enabledColor) }, \
             { QColor(disabledColor), QColor(enabledColor) } \
         }; \
@@ -39,12 +67,18 @@
         _colorInfoMap[Light][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Light][ColorGroupDisabled]; \
         _colorInfoMap[Dark][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupEnabled]; \
         _colorInfoMap[Dark][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupDisabled]; \
+        _colorInfoMap[RedBlack][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupEnabled]; \
+        _colorInfoMap[RedBlack][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupDisabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupEnabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupDisabled]; \
         _colors << #name; \
     }
 
 #define DECLARE_QGC_SINGLE_COLOR(name, color) \
     { \
         PaletteColorInfo_t colorInfo = { \
+            { QColor(color), QColor(color) }, \
+            { QColor(color), QColor(color) }, \
             { QColor(color), QColor(color) }, \
             { QColor(color), QColor(color) } \
         }; \
@@ -53,6 +87,10 @@
         _colorInfoMap[Light][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Light][ColorGroupDisabled]; \
         _colorInfoMap[Dark][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupEnabled]; \
         _colorInfoMap[Dark][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[Dark][ColorGroupDisabled]; \
+        _colorInfoMap[RedBlack][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupEnabled]; \
+        _colorInfoMap[RedBlack][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[RedBlack][ColorGroupDisabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupEnabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupEnabled]; \
+        _colorInfoMap[MilitaryGreen][ColorGroupDisabled][QStringLiteral(#name)] = colorInfo[MilitaryGreen][ColorGroupDisabled]; \
         _colors << #name; \
     }
 
@@ -66,6 +104,10 @@
         c << _colorInfoMap[Light][ColorGroupDisabled][QStringLiteral(#NAME)].name(QColor::HexRgb); \
         c << _colorInfoMap[Dark][ColorGroupEnabled][QStringLiteral(#NAME)].name(QColor::HexRgb); \
         c << _colorInfoMap[Dark][ColorGroupDisabled][QStringLiteral(#NAME)].name(QColor::HexRgb); \
+        c << _colorInfoMap[RedBlack][ColorGroupEnabled][QStringLiteral(#NAME)].name(QColor::HexRgb); \
+        c << _colorInfoMap[RedBlack][ColorGroupDisabled][QStringLiteral(#NAME)].name(QColor::HexRgb); \
+        c << _colorInfoMap[MilitaryGreen][ColorGroupEnabled][QStringLiteral(#NAME)].name(QColor::HexRgb); \
+        c << _colorInfoMap[MilitaryGreen][ColorGroupDisabled][QStringLiteral(#NAME)].name(QColor::HexRgb); \
         return c; \
     } \
     void SETNAME(const QColor& color) { _colorInfoMap[_theme][_colorGroupEnabled  ? ColorGroupEnabled : ColorGroupDisabled][QStringLiteral(#NAME)] = color; _signalPaletteChangeToAll(); }
@@ -103,6 +145,8 @@ public:
     enum Theme {
         Light = 0,
         Dark,
+        RedBlack,
+        MilitaryGreen,
         cMaxTheme
     };
     Q_ENUM(Theme)

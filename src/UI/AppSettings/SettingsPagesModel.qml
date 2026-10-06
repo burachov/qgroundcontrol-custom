@@ -28,10 +28,24 @@ ListModel {
     }
 
     ListElement {
+        name: qsTr("Themes")
+        url: "qrc:/qml/QGroundControl/AppSettings/ThemeSettings.qml"
+        iconUrl: "qrc:/InstrumentValueIcons/palette.svg"
+        pageVisible: function() { return true }
+    }
+
+    ListElement {
+        name: qsTr("OSD Overlay")
+        url: "qrc:/qml/QGroundControl/AppSettings/OSDSettings.qml"
+        iconUrl: "qrc:/InstrumentValueIcons/crosshair.svg"
+        pageVisible: function() { return true }
+    }
+
+    ListElement {
         name: qsTr("Plan View")
         url: "qrc:/qml/QGroundControl/AppSettings/PlanViewSettings.qml"
         iconUrl: "qrc:/qmlimages/Plan.svg"
-        pageVisible: function() { return true }
+        pageVisible: function() { return false }
     }
 
     ListElement {

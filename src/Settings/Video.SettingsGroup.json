@@ -134,6 +134,13 @@
     "enumStrings":      "Default,Force software decoder,Force NVIDIA decoder,Force VA-API decoder,Force DirectX3D 11 decoder,Force VideoToolbox decoder,Force Intel decoder,Force Vulkan decoder",
     "enumValues":       "0,1,2,3,4,5,6,7",
     "default":           0
+},
+{
+    "name":             "customGstreamerPipeline",
+    "shortDesc":        "Custom GStreamer Pipeline",
+    "longDesc":         "Custom GStreamer pipeline string (e.g. udpsrc port=5600 caps=application/x-rtp ! rtph264depay ! avdec_h264). Leave blank to use default receiver.",
+    "type":             "string",
+    "default":          ""
 }
 ]
 }

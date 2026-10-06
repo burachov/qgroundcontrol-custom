@@ -20,6 +20,8 @@
 #include "GstVideoReceiver.h"
 #include "GStreamerHelpers.h"
 #include "QGCLoggingCategory.h"
+#include "SettingsManager.h"
+#include "VideoSettings.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QUrl>
@@ -626,6 +628,21 @@ gboolean GstVideoReceiver::_filterParserCaps(GstElement *bin, GstPad *pad, GstEl
 
 GstElement *GstVideoReceiver::_makeSource(const QString &input)
 {
+    const QString customPipeline = SettingsManager::instance()->videoSettings()->customGstreamerPipeline()->rawValue().toString().trimmed();
+    if (!customPipeline.isEmpty()) {
+        GError *error = nullptr;
+        GstElement *customBin = gst_parse_bin_from_description(customPipeline.toUtf8().constData(), TRUE, &error);
+        if (customBin) {
+            qCDebug(GstVideoReceiverLog) << "Using custom GStreamer pipeline:" << customPipeline;
+            return customBin;
+        } else {
+            qCCritical(GstVideoReceiverLog) << "Failed to parse custom pipeline:" << (error ? error->message : "unknown error");
+            if (error) {
+                g_error_free(error);
+            }
+        }
+    }
+
     if (input.isEmpty()) {
         qCCritical(GstVideoReceiverLog) << "Failed because URI is not specified";
         return nullptr;

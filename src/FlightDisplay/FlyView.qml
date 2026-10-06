@@ -80,14 +80,18 @@ Item {
     }
 
     FlyViewToolBar {
-        id:         toolbar
-        visible:    !QGroundControl.videoManager.fullScreen
+        id:             toolbar
+        anchors.bottom: parent.bottom
+        anchors.left:   parent.left
+        anchors.right:  parent.right
+        visible:        !QGroundControl.videoManager.fullScreen
+        z:              QGroundControl.zOrderWidgets + 10
     }
 
     Item {
         id:                 mapHolder
-        anchors.top:        toolbar.bottom
-        anchors.bottom:     parent.bottom
+        anchors.top:        parent.top
+        anchors.bottom:     toolbar.visible ? toolbar.top : parent.bottom
         anchors.left:       parent.left
         anchors.right:      parent.right
 

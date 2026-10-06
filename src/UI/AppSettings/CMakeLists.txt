@@ -16,6 +16,7 @@ qt_add_qml_module(AppSettingsModule
         MapSettings.qml
         MockLink.qml
         MockLinkSettings.qml
+        OSDSettings.qml
         PlanViewSettings.qml
         PX4LogTransferSettings.qml
         RemoteIDSettings.qml
@@ -24,6 +25,7 @@ qt_add_qml_module(AppSettingsModule
         SettingsPagesModel.qml
         TcpSettings.qml
         TelemetrySettings.qml
+        ThemeSettings.qml
         UdpSettings.qml
         VideoSettings.qml
     NO_PLUGIN # Required by Qt 6.6.3. TODO: Remove when no longer supported.

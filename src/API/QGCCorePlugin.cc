@@ -122,12 +122,7 @@ bool QGCCorePlugin::adjustSettingMetaData(const QString &settingsGroup, FactMeta
 {
     if (settingsGroup == AppSettings::settingsGroup) {
         if (metaData.name() == AppSettings::indoorPaletteName) {
-            QVariant outdoorPalette;
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-            outdoorPalette = 0;
-#else
-            outdoorPalette = 1;
-#endif
+            QVariant outdoorPalette = 1; // Default Dark theme
             metaData.setRawDefaultValue(outdoorPalette);
             return true;
         }
@@ -324,22 +319,8 @@ const QVariantList &QGCCorePlugin::toolBarIndicators()
 
 QVariantList QGCCorePlugin::firstRunPromptsToShow()
 {
-    QList<int> rgIdsToShow;
-
-    rgIdsToShow.append(firstRunPromptStdIds());
-    rgIdsToShow.append(firstRunPromptCustomIds());
-
-    const QList<int> rgAlreadyShownIds = AppSettings::firstRunPromptsIdsVariantToList(SettingsManager::instance()->appSettings()->firstRunPromptIdsShown()->rawValue());
-    for (int idToRemove: rgAlreadyShownIds) {
-        (void) rgIdsToShow.removeOne(idToRemove);
-    }
-
-    QVariantList rgVarIdsToShow;
-    for (int id: rgIdsToShow) {
-        rgVarIdsToShow.append(id);
-    }
-
-    return rgVarIdsToShow;
+    // Bypassed: no welcome screen / first run prompts for tactical deployment
+    return QVariantList();
 }
 
 QString QGCCorePlugin::firstRunPromptResource(int id) const

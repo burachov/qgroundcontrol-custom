@@ -134,9 +134,6 @@ void ParameterManager::_updateProgressBar()
 
 void ParameterManager::mavlinkMessageReceived(const mavlink_message_t &message)
 {
-    if (_tryftp && (message.compid == MAV_COMP_ID_AUTOPILOT1) && !_initialLoadComplete)
-        return;
-
     if (message.msgid == MAVLINK_MSG_ID_PARAM_VALUE) {
         mavlink_param_value_t param_value{};
         mavlink_msg_param_value_decode(&message, &param_value);

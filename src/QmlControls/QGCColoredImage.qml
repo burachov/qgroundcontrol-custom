@@ -29,7 +29,7 @@ Item {
         smooth:             true
         mipmap:             true
         antialiasing:       true
-        visible:            false
+        visible:            parent.color.a === 0
         fillMode:           Image.PreserveAspectFit
         anchors.fill:       parent
         sourceSize.height:  height
@@ -39,5 +39,6 @@ Item {
         anchors.fill:       image
         source:             image
         color:              parent.color
+        visible:            parent.color.a > 0
     }
 }

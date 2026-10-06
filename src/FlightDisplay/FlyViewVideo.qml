@@ -58,7 +58,7 @@ Item {
         id:             videoStreaming
         anchors.fill:   parent
         useSmallFont:   _root.pipState.state !== _root.pipState.fullState
-        visible:        QGroundControl.videoManager.isStreamSource
+        visible:        !QGroundControl.videoManager.isUvc
     }
     //-- UVC Video (USB Camera or Video Device)
     Loader {

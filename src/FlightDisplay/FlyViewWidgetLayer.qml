@@ -61,13 +61,13 @@ Item {
         leftEdgeBottomInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.leftEdgeBottomInset : parentToolInsets.leftEdgeBottomInset
         rightEdgeTopInset:      topRightPanel.rightEdgeTopInset
         rightEdgeCenterInset:   topRightPanel.rightEdgeCenterInset
-        rightEdgeBottomInset:   bottomRightRowLayout.rightEdgeBottomInset
+        rightEdgeBottomInset:   movableInstruments.rightEdgeBottomInset
         topEdgeLeftInset:       toolStrip.topEdgeLeftInset
         topEdgeCenterInset:     mapScale.topEdgeCenterInset
         topEdgeRightInset:      topRightPanel.topEdgeRightInset
         bottomEdgeLeftInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
-        bottomEdgeCenterInset:  bottomRightRowLayout.bottomEdgeCenterInset
-        bottomEdgeRightInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeRightInset : bottomRightRowLayout.bottomEdgeRightInset
+        bottomEdgeCenterInset:  movableInstruments.bottomEdgeCenterInset
+        bottomEdgeRightInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeRightInset : movableInstruments.bottomEdgeRightInset
     }
 
     FlyViewTopRightPanel {
@@ -76,7 +76,7 @@ Item {
         anchors.right:          parent.right
         anchors.topMargin:      ScreenTools.toolbarHeight + _layoutMargin
         anchors.rightMargin:    _layoutMargin
-        maximumHeight:          parent.height - (bottomRightRowLayout.height + _margins * 5) - ScreenTools.toolbarHeight
+        maximumHeight:          parent.height - (movableInstruments.height + _margins * 5) - ScreenTools.toolbarHeight
 
         property real topEdgeRightInset:    height + _layoutMargin
         property real rightEdgeTopInset:    width + _layoutMargin
@@ -101,14 +101,14 @@ Item {
         id:                 movableInstruments
         z:                  QGroundControl.zOrderWidgets
         width:              bottomRightRowLayout.width
-        height:             bottomRightRowLayout.height + (isPinned ? 0 : dragHandleBar.height)
+        height:             bottomRightRowLayout.height + (movableInstruments.isPinned ? 0 : dragHandleBar.height)
 
         property bool isPinned: QGroundControl.loadBoolGlobalSetting("Instruments_Pinned", false)
         property real savedX:   QGroundControl.loadDoubleGlobalSetting("Instruments_PosX", -1)
         property real savedY:   QGroundControl.loadDoubleGlobalSetting("Instruments_PosY", -1)
 
-        x: (savedX >= 0 && savedX <= (parent.width - width)) ? savedX : (parent.width - width - _layoutMargin)
-        y: (savedY >= 0 && savedY <= (parent.height - height)) ? savedY : (parent.height - height - _layoutMargin)
+        x: (savedX >= 0 && parent && savedX <= (parent.width - width)) ? savedX : (parent ? (parent.width - width - _layoutMargin) : 0)
+        y: (savedY >= 60 && parent && savedY <= (parent.height - height)) ? savedY : (parent ? (parent.height - height - _layoutMargin) : 0)
 
         property real bottomEdgeRightInset:     height + _layoutMargin
         property real bottomEdgeCenterInset:    bottomEdgeRightInset
@@ -120,8 +120,8 @@ Item {
             anchors.top:        parent.top
             anchors.left:       parent.left
             anchors.right:      parent.right
-            height:             isPinned ? 0 : ScreenTools.defaultFontPixelHeight * 2
-            visible:            !isPinned
+            height:             movableInstruments.isPinned ? 0 : ScreenTools.defaultFontPixelHeight * 2
+            visible:            !movableInstruments.isPinned
             color:              "#DD1A1A1A"
             radius:             4
             border.color:       qgcPal.colorGreen
@@ -134,12 +134,37 @@ Item {
                 anchors.rightMargin: 8
                 spacing:            6
 
-                QGCLabel {
-                    text:               qsTr("✥ DRAG")
-                    font.bold:          true
-                    font.pointSize:     ScreenTools.smallFontPointSize
-                    color:              qgcPal.colorGreen
+                // Drag grabber area
+                Item {
                     Layout.fillWidth:   true
+                    Layout.fillHeight:  true
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left:           parent.left
+                        text:                   qsTr("✥ DRAG")
+                        font.bold:              true
+                        font.pointSize:         ScreenTools.smallFontPointSize
+                        color:                  qgcPal.colorGreen
+                    }
+
+                    MouseArea {
+                        id:                 dragArea
+                        anchors.fill:       parent
+                        preventStealing:    true
+                        drag.target:        movableInstruments
+                        drag.axis:          Drag.XAndYAxis
+                        drag.minimumX:      10
+                        drag.maximumX:      movableInstruments.parent ? (movableInstruments.parent.width - movableInstruments.width - 10) : 500
+                        drag.minimumY:      60
+                        drag.maximumY:      movableInstruments.parent ? (movableInstruments.parent.height - movableInstruments.height - 10) : 500
+                        onReleased: {
+                            movableInstruments.savedX = movableInstruments.x
+                            movableInstruments.savedY = movableInstruments.y
+                            QGroundControl.saveDoubleGlobalSetting("Instruments_PosX", movableInstruments.x)
+                            QGroundControl.saveDoubleGlobalSetting("Instruments_PosY", movableInstruments.y)
+                        }
+                    }
                 }
 
                 QGCButton {
@@ -150,6 +175,9 @@ Item {
                         if (bottomRightRowLayout.telemetryValuesBar) {
                             var grid = bottomRightRowLayout.telemetryValuesBar.factValueGrid
                             grid.settingsUnlocked = !grid.settingsUnlocked
+                        }
+                        if (bottomRightRowLayout.instrumentPanel) {
+                            bottomRightRowLayout.instrumentPanel._showSelectionUI = !bottomRightRowLayout.instrumentPanel._showSelectionUI
                         }
                     }
                 }
@@ -162,21 +190,6 @@ Item {
                         movableInstruments.isPinned = true
                         QGroundControl.saveBoolGlobalSetting("Instruments_Pinned", true)
                     }
-                }
-            }
-
-            MouseArea {
-                id:                 dragArea
-                anchors.fill:       parent
-                drag.target:        movableInstruments
-                drag.axis:          Drag.XAndYAxis
-                drag.minimumX:      10
-                drag.maximumX:      movableInstruments.parent ? (movableInstruments.parent.width - movableInstruments.width - 10) : 500
-                drag.minimumY:      60
-                drag.maximumY:      movableInstruments.parent ? (movableInstruments.parent.height - movableInstruments.height - 10) : 500
-                onReleased: {
-                    QGroundControl.saveDoubleGlobalSetting("Instruments_PosX", movableInstruments.x)
-                    QGroundControl.saveDoubleGlobalSetting("Instruments_PosY", movableInstruments.y)
                 }
             }
         }
@@ -193,7 +206,7 @@ Item {
             color:              "#CC222222"
             border.color:       qgcPal.button
             border.width:       1
-            visible:            isPinned
+            visible:            movableInstruments.isPinned
             z:                  10
 
             QGCLabel {
@@ -213,7 +226,7 @@ Item {
 
         FlyViewBottomRightRowLayout {
             id:                 bottomRightRowLayout
-            anchors.top:        isPinned ? parent.top : dragHandleBar.bottom
+            anchors.top:        movableInstruments.isPinned ? parent.top : dragHandleBar.bottom
             anchors.left:       parent.left
             spacing:            _layoutSpacing
         }

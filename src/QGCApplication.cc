@@ -239,12 +239,14 @@ void QGCApplication::setLanguage()
         } else {
             qCWarning(QGCApplicationLog) << "Qt lib localization for" << _locale.name() << "is not present";
         }
-        if (_qgcTranslatorSourceCode.load(_locale, QLatin1String("qgc_source_"), "", ":/i18n")) {
+        if (_qgcTranslatorSourceCode.load(_locale, QLatin1String("qgc_source_"), "", ":/i18n") ||
+            _qgcTranslatorSourceCode.load(_locale, QLatin1String("qgc_source_"), "", ":/")) {
             installTranslator(&_qgcTranslatorSourceCode);
         } else {
             qCWarning(QGCApplicationLog) << "Error loading source localization for" << _locale.name();
         }
-        if (JsonHelper::translator()->load(_locale, QLatin1String("qgc_json_"), "", ":/i18n")) {
+        if (JsonHelper::translator()->load(_locale, QLatin1String("qgc_json_"), "", ":/i18n") ||
+            JsonHelper::translator()->load(_locale, QLatin1String("qgc_json_"), "", ":/")) {
             installTranslator(JsonHelper::translator());
         } else {
             qCWarning(QGCApplicationLog) << "Error loading json localization for" << _locale.name();

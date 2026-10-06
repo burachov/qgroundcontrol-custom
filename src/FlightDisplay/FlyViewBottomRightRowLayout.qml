@@ -16,6 +16,7 @@ import QGroundControl.FlightDisplay
 
 RowLayout {
     property alias telemetryValuesBar: telemetryBar
+    property alias instrumentPanel:    instrumentPanel
 
     TelemetryValuesBar {
         id:                     telemetryBar
